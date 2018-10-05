@@ -4,6 +4,24 @@
 # Copyright 2018 SZEDER Gábor
 
 import argparse
+import os
+import sys
+import yaml
+
+def die(msg):
+    print(msg)
+    exit(1)
+
+def get_travis_access_token():
+    errmsg = "error: couldn't read Travis CI API access token: "
+    try:
+        with open(os.environ['HOME'] + '/.travis/config.yml', 'r') as f:
+            return yaml.load(f)['endpoints']['https://api.travis-ci.org/']['access_token']
+    except KeyError as e:
+        die(errmsg + 'No such key: ' + str(e))
+    except Exception as e:
+        die(errmsg + str(e))
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('resource', choices=['branches', 'builds'],
@@ -14,3 +32,6 @@ parser.add_argument('reposlug', metavar='repo-slug',
 args = parser.parse_args()
 
 print('Will show ' + args.resource + ' on repo ' + args.reposlug + '...')
+
+access_token = get_travis_access_token()
+print('Will use access token starting with: ' + access_token[:8] + '...')

@@ -31,6 +31,14 @@ parser.add_argument('resource', choices=['branches', 'builds'],
 parser.add_argument('reposlug', metavar='repo-slug', nargs='?', default='',
     help="<username>/<reponame>")
 
+color_args = parser.add_argument_group()
+color_args.add_argument('-c', '--color', dest='use_color',
+    action='store_const', const=1, default=sys.stdout.isatty(),
+    help="use colors (even when stdout is not a TTY)")
+color_args.add_argument('--no-color', dest='use_color',
+    action='store_const', const=0,
+    help="don't use colors (even when stdout is a TTY)")
+
 args = parser.parse_args()
 
 if args.reposlug == '':
@@ -65,7 +73,7 @@ req_headers = {
 response = requests.get(url, headers=req_headers)
 response.raise_for_status()
 
-if sys.stdout.isatty():
+if args.use_color:
     states_to_letters = {
         'created':  '\033[033mc\033[0m',
         'queued':   '\033[033mq\033[0m',

@@ -65,16 +65,28 @@ req_headers = {
 response = requests.get(url, headers=req_headers)
 response.raise_for_status()
 
-states_to_letters = {
-    'created':  'c',
-    'queued':   'q',
-    'received': 'b',   # web says "booting"
-    'started':  's',
-    'passed':   'P',
-    'errored':  '!',
-    'failed':   'X',
-    'canceled': '_'
-}
+if sys.stdout.isatty():
+    states_to_letters = {
+        'created':  '\033[033mc\033[0m',
+        'queued':   '\033[033mq\033[0m',
+        'received': '\033[034mb\033[0m',   # web says "booting"
+        'started':  '\033[034ms\033[0m',
+        'passed':   '\033[032mP\033[0m',
+        'errored':  '\033[031m!\033[0m',
+        'failed':   '\033[031mX\033[0m',
+        'canceled': '_'
+    }
+else:
+    states_to_letters = {
+        'created':  'c',
+        'queued':   'q',
+        'received': 'b',   # web says "booting"
+        'started':  's',
+        'passed':   'P',
+        'errored':  '!',
+        'failed':   'X',
+        'canceled': '_'
+    }
 
 if args.resource == 'branches':
     for branch in response.json()['branches']:

@@ -5,6 +5,7 @@
 
 import argparse
 import os
+import requests
 import sys
 import yaml
 
@@ -35,3 +36,24 @@ print('Will show ' + args.resource + ' on repo ' + args.reposlug + '...')
 
 access_token = get_travis_access_token()
 print('Will use access token starting with: ' + access_token[:8] + '...')
+
+url = 'https://api.travis-ci.org/repo/'
+url += args.reposlug.replace("/", "%2F")
+url += '/'
+url += args.resource
+url += '?limit=20'
+url += '&offset=0'
+url += '&include=build.jobs'
+url += '&sort_by=last_build:desc'
+
+print('Will retrieve ' + url + '...')
+
+req_headers = {
+    'Travis-API-Version': '3',
+    'Authorization': 'token ' + get_travis_access_token()
+}
+
+response = requests.get(url, headers=req_headers)
+response.raise_for_status()
+
+print('All went well!')

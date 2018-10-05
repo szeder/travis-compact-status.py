@@ -32,10 +32,7 @@ parser.add_argument('reposlug', metavar='repo-slug',
 
 args = parser.parse_args()
 
-print('Will show ' + args.resource + ' on repo ' + args.reposlug + '...')
-
 access_token = get_travis_access_token()
-print('Will use access token starting with: ' + access_token[:8] + '...')
 
 url = 'https://api.travis-ci.org/repo/'
 url += args.reposlug.replace("/", "%2F")
@@ -46,8 +43,6 @@ url += '&offset=0'
 url += '&include=build.jobs'
 url += '&sort_by=last_build:desc'
 
-print('Will retrieve ' + url + '...')
-
 req_headers = {
     'Travis-API-Version': '3',
     'Authorization': 'token ' + get_travis_access_token()
@@ -56,4 +51,26 @@ req_headers = {
 response = requests.get(url, headers=req_headers)
 response.raise_for_status()
 
-print('All went well!')
+states_to_letters = {
+    'created':  'c',
+    'queued':   'q',
+    'received': 'b',   # web says "booting"
+    'started':  's',
+    'passed':   'P',
+    'errored':  '!',
+    'failed':   'X',
+    'canceled': '_'
+}
+
+if args.resource == 'branches':
+    for branch in response.json()['branches']:
+        states = ''
+        for job in branch['last_build']['jobs']:
+            states += states_to_letters[job['state']]
+        print(states + '  ' + branch['name'])
+elif args.resource == 'builds':
+    for build in response.json()['builds']:
+        states = ''
+        for job in build['jobs']:
+            states += states_to_letters[job['state']]
+        print(states + '  ' + build['branch']['name'])

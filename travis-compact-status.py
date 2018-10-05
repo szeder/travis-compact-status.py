@@ -6,6 +6,7 @@
 import argparse
 import os
 import requests
+import subprocess
 import sys
 import yaml
 
@@ -27,15 +28,28 @@ def get_travis_access_token():
 parser = argparse.ArgumentParser()
 parser.add_argument('resource', choices=['branches', 'builds'],
     help="list branches or builds")
-parser.add_argument('reposlug', metavar='repo-slug',
+parser.add_argument('reposlug', metavar='repo-slug', nargs='?', default='',
     help="<username>/<reponame>")
 
 args = parser.parse_args()
 
+if args.reposlug == '':
+    try:
+        # The output of 'git config' includes a trailing newline
+        # character, strip it.
+        reposlug = subprocess.check_output(['git', 'config', 'travis.slug']) \
+            .decode().rstrip()
+    except Exception:
+        # It doesn't matter, why it failed (no 'git' command in $PATH or no
+        # such config variable)
+        die("error: couldn't find 'travis.slug' config variable")
+else:
+    reposlug = args.reposlug
+
 access_token = get_travis_access_token()
 
 url = 'https://api.travis-ci.org/repo/'
-url += args.reposlug.replace("/", "%2F")
+url += reposlug.replace("/", "%2F")
 url += '/'
 url += args.resource
 url += '?limit=20'

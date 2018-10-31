@@ -31,6 +31,10 @@ parser.add_argument('resource', choices=['branches', 'builds'],
 parser.add_argument('reposlug', metavar='repo-slug', nargs='?', default='',
     help="<username>/<reponame>")
 
+parser.add_argument('-n', '--count', dest='count',
+    type=int, default=20, choices=range(1, 101),
+    metavar='1..100', help="number of builds to show")
+
 color_args = parser.add_argument_group()
 color_args.add_argument('-c', '--color', dest='use_color',
     action='store_const', const=1, default=sys.stdout.isatty(),
@@ -60,7 +64,7 @@ url = 'https://api.travis-ci.org/repo/'
 url += reposlug.replace("/", "%2F")
 url += '/'
 url += args.resource
-url += '?limit=20'
+url += '?limit=' + str(args.count)
 url += '&offset=0'
 url += '&include=build.jobs'
 url += '&sort_by=last_build:desc'

@@ -105,10 +105,10 @@ if args.resource == 'branches':
         states = ''
         for job in branch['last_build']['jobs']:
             states += states_to_letters[job['state']]
-        print(states + '  ' + branch['name'])
+        print(states + ' ' + branch['last_build']['number'] + '  ' + branch['name'])
 elif args.resource == 'builds':
     for build in response.json()['builds']:
         states = ''
         for job in build['jobs']:
             states += states_to_letters[job['state']]
-        print(states + '  ' + build['branch']['name'])
+        print(states + ' ' + build['number'] + '  ' + build['branch']['name'])

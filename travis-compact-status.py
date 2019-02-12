@@ -71,7 +71,8 @@ url += '&sort_by=last_build:desc'
 
 req_headers = {
     'Travis-API-Version': '3',
-    'Authorization': 'token ' + get_travis_access_token()
+    'Authorization': 'token ' + get_travis_access_token(),
+    'User-Agent': 'travis-compact-status.py/0.0.1'
 }
 
 response = requests.get(url, headers=req_headers)

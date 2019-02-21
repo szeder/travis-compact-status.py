@@ -10,6 +10,14 @@ import subprocess
 import sys
 import yaml
 
+if sys.version_info < (3, 0) and \
+   not sys.stdout.isatty() and \
+   'PYTHONIOENCODING' not in os.environ:
+    import codecs
+    UTF8Writer = codecs.getwriter('utf8')
+    sys.stdout = UTF8Writer(sys.stdout)
+
+
 def die(msg):
     print(msg)
     exit(1)

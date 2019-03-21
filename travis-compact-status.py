@@ -110,14 +110,20 @@ else:
     }
 
 if args.resource == 'branches':
+    max_jobs = len(max(response.json()['branches'], key=lambda b:len(b['last_build']['jobs']))['last_build']['jobs'])
     for branch in response.json()['branches']:
         states = ''
         for job in branch['last_build']['jobs']:
             states += states_to_letters[job['state']]
+        for i in range(0, max_jobs - len(branch['last_build']['jobs'])):
+            states += ' '
         print(states + ' ' + branch['last_build']['number'] + '  ' + branch['name'])
 elif args.resource == 'builds':
+    max_jobs = len(max(response.json()['builds'], key=lambda b:len(b['jobs']))['jobs'])
     for build in response.json()['builds']:
         states = ''
         for job in build['jobs']:
             states += states_to_letters[job['state']]
+        for i in range(0, max_jobs - len(build['jobs'])):
+            states += ' '
         print(states + ' ' + build['number'] + '  ' + build['branch']['name'])

@@ -26,7 +26,7 @@ def get_travis_access_token():
     errmsg = "error: couldn't read Travis CI API access token: "
     try:
         with open(os.environ['HOME'] + '/.travis/config.yml', 'r') as f:
-            return yaml.load(f)['endpoints']['https://api.travis-ci.org/']['access_token']
+            return yaml.safe_load(f)['endpoints']['https://api.travis-ci.org/']['access_token']
     except KeyError as e:
         die(errmsg + 'No such key: ' + str(e))
     except Exception as e:
